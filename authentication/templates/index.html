@@ -1,0 +1,66 @@
+{% if message %}
+<script>
+    alert(`{{message}}`)
+</script>
+{% endif %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Login</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+    <h1>Tela de login</h1>
+    <form action="/login/", method="post">
+        {% csrf_token %}
+        <input name="email" placeholder="email" type="email"/>
+        <input name="password" placeholder="password" type="password"/>
+        <input name="button" type="submit"/>
+    </form>
+    <button onclick="loginGoogle()">Google</button>
+</body>
+<script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-auth-compat.js"></script>
+<script>
+const firebaseApp = firebase.initializeApp({
+    apiKey: "AIzaSyBM5cq92ytGB-0wmFZOY_g8l3Cqh-OKhtg",
+    authDomain: "auth-29a51.firebaseapp.com",
+    databaseURL: "https://auth-29a51-default-rtdb.firebaseio.com",
+    projectId: "auth-29a51",
+    storageBucket: "auth-29a51.appspot.com",
+    messagingSenderId: "83925202178",
+    appId: "1:83925202178:web:c518bfc6d1d38ea3257e1b",
+    measurementId: "G-8GCXT7D304"
+    });
+const db = firebaseApp.firestore();
+const auth = firebaseApp.auth();
+
+function loginGoogle(){
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth()
+    .signInWithPopup(provider)
+    .then((result) => {
+        /** @type {firebase.auth.OAuthCredential} */
+        var credential = result.credential;
+
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = credential.accessToken;
+        // The signed-in user info.
+        var user = result.user;
+        // ...
+    }).catch((error) => {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+    });
+}
+</script>
+</html>
