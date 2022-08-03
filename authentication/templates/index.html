@@ -3,63 +3,93 @@
     alert(`{{message}}`)
 </script>
 {% endif %}
-<!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Login</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <!DOCTYPE html>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--
+    Seu Google client ID
+    Esse client ID foi criado no passo anterior
+  -->
+  <meta name="google-signin-client_id" content="83925202178-l6p3s8ek1hvt63apot1ajgmoktg8eukj.apps.googleusercontent.com">
+
+  <title>Google authentication - Exemplo 1</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap-theme.min.css">
 </head>
 <body>
-    <h1>Tela de login</h1>
-    <form action="/login/", method="post">
-        {% csrf_token %}
-        <input name="email" placeholder="email" type="email"/>
-        <input name="password" placeholder="password" type="password"/>
-        <input name="button" type="submit"/>
-    </form>
-    <button onclick="loginGoogle()">Google</button>
+  <div class="container body-content">
+    <div class="box-login">
+      <h2>Login</h2>
+
+      <!-- html do botão -->
+      <div id="meu-botao"></div>
+
+      <hr/>
+      <a href="javascript:void(0);" onclick="signOut();">Sign out</a>
+    </div>
+    <hr />
+    <footer>
+      <p>&copy; Fábrica de Código</p>
+    </footer>
+  </div>
+
+
+  <!--Google Platform Library-->
+  <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+
+  <!--JQuery e Bootstrap - Não são obrigatórios para ao autenticação -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </body>
-<script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-auth-compat.js"></script>
 <script>
-const firebaseApp = firebase.initializeApp({
-    apiKey: "AIzaSyBM5cq92ytGB-0wmFZOY_g8l3Cqh-OKhtg",
-    authDomain: "auth-29a51.firebaseapp.com",
-    databaseURL: "https://auth-29a51-default-rtdb.firebaseio.com",
-    projectId: "auth-29a51",
-    storageBucket: "auth-29a51.appspot.com",
-    messagingSenderId: "83925202178",
-    appId: "1:83925202178:web:c518bfc6d1d38ea3257e1b",
-    measurementId: "G-8GCXT7D304"
+/**
+  Renderiza o botão de login na tela
+*/
+function renderButton() {
+    gapi.signin2.render('meu-botao', {
+        'scope': 'email profile https://www.googleapis.com/auth/plus.login', // solicitando acesso ao profile e ao e-mail do usuário
+        'width': 250,
+        'height': 50,
+        'longtitle': true,
+        'theme': 'dark',
+        'onsuccess': onSuccess,
+        'onilure': onFailure
     });
-const db = firebaseApp.firestore();
-const auth = firebaseApp.auth();
+}
 
-function loginGoogle(){
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth()
-    .signInWithPopup(provider)
-    .then((result) => {
-        /** @type {firebase.auth.OAuthCredential} */
-        var credential = result.credential;
+/**
+  Função executada quando o login é efetuado com sucesso
+*/
+function onSuccess(googleUser) {
+    // Recuperando o profile do usuário
+    var profile = googleUser.getBasicProfile();
+    console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+    console.log("Name: " + profile.getName());
+    console.log("Image URL: " + profile.getImageUrl());
+    console.log("Email: " + profile.getEmail());
 
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        var token = credential.accessToken;
-        // The signed-in user info.
-        var user = result.user;
-        // ...
-    }).catch((error) => {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
+    // Recuperando o token do usuario. Essa informação você necessita passar para seu backend
+    var id_token = googleUser.getAuthResponse().id_token;
+    console.log("ID Token: " + id_token);
+}
+
+/**
+  Função executada quando ocorrer falha no logn
+*/
+function onFailure(error) {
+    console.log(error);
+}
+
+/**
+  Função de deslogar o usuário
+*/
+function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        console.log('User signed out.');
     });
 }
 </script>
