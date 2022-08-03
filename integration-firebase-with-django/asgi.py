@@ -1,5 +1,5 @@
 """
-ASGI config for myteste project.
+ASGI config for integration-firebase-with-django project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myteste.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'integration-firebase-with-django.settings')
 
 application = get_asgi_application()
